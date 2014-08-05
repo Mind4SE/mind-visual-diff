@@ -42,6 +42,7 @@ import org.ow2.mind.adl.ast.ComponentContainer;
 import org.ow2.mind.adl.ast.ImplementationContainer;
 import org.ow2.mind.adl.ast.MindInterface;
 import org.ow2.mind.adl.ast.Source;
+import org.ow2.mind.diff.Launcher;
 import org.ow2.mind.idl.IDLLoader;
 import org.ow2.mind.io.BasicOutputFileLocator;
 
@@ -53,9 +54,6 @@ import com.google.inject.Injector;
  * @author Julien TOUS
  */
 public class DumpDotGenerator {
-
-	protected static Logger               logger = FractalADLLogManager
-            .getLogger("minddiff");
 	
 	/*
 	 * Works because our Loader is itself loaded by Google Guice.
@@ -159,7 +157,7 @@ public class DumpDotGenerator {
 					throws ADLException {
 		this.context = context;
 
-		logger.info("MindDiff Graph generator: Start creating .gv files...");
+		Launcher.logger.info("MindDiff Graph generator: Start creating .gv files...");
 		
 		String topLevelName = "TopLevel"; //FIXME get the executable name.
 
@@ -177,7 +175,7 @@ public class DumpDotGenerator {
 		
 		topDot.close();
 		
-		logger.info("Graph generator: Finished.");
+		Launcher.logger.info("Graph generator: Finished.");
 		
 		return null;
 	}

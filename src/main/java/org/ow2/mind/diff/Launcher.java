@@ -54,7 +54,7 @@ import org.ow2.mind.io.OutputFileLocator;
 
 public class Launcher  extends org.ow2.mind.Launcher {
 
-	protected static final String PROGRAM_NAME_PROPERTY_NAME = "mindunit.launcher.name";
+	protected static final String PROGRAM_NAME_PROPERTY_NAME = "minddiff.launcher.name";
 	protected static final String ID_PREFIX                  = "org.ow2.mind.unit.test.";
 
 	protected final CmdFlag 		helpOpt					= new CmdFlag(
@@ -78,7 +78,7 @@ public class Launcher  extends org.ow2.mind.Launcher {
 
 	protected final Options 		options					= new Options();
 
-	protected static Logger			logger					= FractalADLLogManager.getLogger("mindunit");
+	public static Logger			logger					= FractalADLLogManager.getLogger("visual-diff");
 
 	protected NodeFactory			nodeFactoryItf;
 	protected Loader 				loaderItf;
@@ -147,7 +147,8 @@ public class Launcher  extends org.ow2.mind.Launcher {
 
 		final List<Object> result = new ArrayList<Object>();
 
-		logger.info("Launching graphical diff files generation... (base: " + baseAdlName + " - head: " + headAdlName + ")");
+		logger.info("Launching graphical diff files generation...");
+		logger.info("BASE: " + baseAdlName + " - HEAD: " + headAdlName);
 
 		// load both definitions
 		try {
@@ -163,8 +164,9 @@ public class Launcher  extends org.ow2.mind.Launcher {
 		}
 
 		// Do the job
-		try {
+		try {logger.info("Starting component definition trees analysis...");
 			resultDefinitionTree = compareDefinitionTrees(baseArchDef, headArchDef, baseContext, headContext);
+			logger.info("Finished.");
 		} catch (ADLException e) {
 			logger.severe("Error: could not compare definitions !");
 			// TODO Auto-generated catch block
@@ -175,6 +177,7 @@ public class Launcher  extends org.ow2.mind.Launcher {
 		DumpDotGenerator dotGenerator = injector.getInstance(DumpDotGenerator.class);
 		try {
 			dotGenerator.generateDot(resultDefinitionTree, compilerContext);
+			logger.info("Successful.");
 		} catch (ADLException e) {
 			logger.severe("Error: could not generate .gv files !");
 			// TODO Auto-generated catch block
