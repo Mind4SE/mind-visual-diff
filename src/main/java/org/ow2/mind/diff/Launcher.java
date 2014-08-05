@@ -278,13 +278,13 @@ public class Launcher  extends org.ow2.mind.Launcher {
 					result.addComponent(cloneComp);
 
 					// If the common instance has a different definition, signal it and do sub-diff
-					if (!currHeadSubDef.getName().equals(currBaseSubDef.getName())) {
+					if (!currHeadSubDef.getName().equals(currBaseSubDef.getName()))
 						DiffHelper.setSubCompDefChanged(cloneComp);
-						
-						// recursion
-						Definition subResultDef = compareDefinitionTrees(currBaseSubDef, currHeadSubDef, baseContext, headContext);
-						ASTHelper.setResolvedComponentDefinition(cloneComp, subResultDef);
-					}
+					
+					// Recursion
+					// for all identical or modified sub-component definitions (but not the completely new or old)
+					Definition subResultDef = compareDefinitionTrees(currBaseSubDef, currHeadSubDef, baseContext, headContext);
+					ASTHelper.setResolvedComponentDefinition(cloneComp, subResultDef);
 				}
 			}
 		}
