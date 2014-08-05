@@ -36,6 +36,7 @@ import org.objectweb.fractal.adl.Loader;
 import org.objectweb.fractal.adl.NodeFactory;
 import org.objectweb.fractal.adl.NodeUtil;
 import org.objectweb.fractal.adl.error.Error;
+import org.objectweb.fractal.adl.interfaces.InterfaceContainer;
 import org.objectweb.fractal.adl.merger.NodeMerger;
 import org.objectweb.fractal.adl.util.FractalADLLogManager;
 import org.ow2.mind.CommonASTHelper;
@@ -241,7 +242,8 @@ public class Launcher  extends org.ow2.mind.Launcher {
 		}
 
 		// TODO: Compare provided and required interfaces
-
+		result = (Definition) CommonASTHelper.turnsTo(result, InterfaceContainer.class, nodeFactoryItf, nodeMergerItf);
+		
 		return result;
 	}
 
@@ -288,9 +290,12 @@ public class Launcher  extends org.ow2.mind.Launcher {
 					// Recursion
 					// for all identical or modified sub-component definitions (but not the completely new or old)
 					Definition subResultDef = compareDefinitionTrees(currBaseSubDef, currHeadSubDef, baseContext, headContext);
+					
 					ASTHelper.setResolvedComponentDefinition(cloneComp, subResultDef);
 					DefinitionReference subResultDefRef = ASTHelper.newDefinitionReference(nodeFactoryItf, subResultDef.getName());
 					ASTHelper.setResolvedDefinition(subResultDefRef, subResultDef);
+					
+					cloneComp.setDefinitionReference(subResultDefRef);
 				}
 			}
 		}
