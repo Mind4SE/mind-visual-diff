@@ -260,6 +260,11 @@ public class Launcher  extends org.ow2.mind.Launcher {
 
 			// Try to find the same sub-component in the original definition
 			for (Component currBaseSubComponent : baseComponents) {
+				
+				// Definitions are needed for deeper comparisons
+				Definition currBaseSubDef = ASTHelper.getResolvedComponentDefinition(currBaseSubComponent, loaderItf, baseContext);
+				Definition currHeadSubDef = ASTHelper.getResolvedComponentDefinition(currHeadSubComponent, loaderItf, headContext);
+				
 				if (currHeadSubComponent.getName().equals(currBaseSubComponent.getName())) {
 					// Instance is common to BASE and HEAD
 
@@ -268,17 +273,17 @@ public class Launcher  extends org.ow2.mind.Launcher {
 					baseComponentsList.remove(currBaseSubComponent);
 					headComponentsList.remove(currHeadSubComponent);
 
-					// Are types equivalent ?
-					Definition currHeadSubDef = ASTHelper.getResolvedComponentDefinition(currHeadSubComponent, loaderItf, headContext); // HEAD == Result (cloneTree)
-					Definition currBaseSubDef = ASTHelper.getResolvedComponentDefinition(currBaseSubComponent, loaderItf, baseContext);
-
 					// Add a clone of the sub-component in our new definition
 					Component cloneComp = NodeUtil.cloneNode(currHeadSubComponent);
 					result.addComponent(cloneComp);
 
-					// If the common instance has a different definition, signal it
+					// If the common instance has a different definition, signal it and do sub-diff
 					if (!currHeadSubDef.getName().equals(currBaseSubDef.getName())) {
 						DiffHelper.setSubCompDefChanged(cloneComp);
+						
+						// recursion
+						Definition subResultDef = compareDefinitionTrees(currBaseSubDef, currHeadSubDef, baseContext, headContext);
+						ASTHelper.setResolvedComponentDefinition(cloneComp, subResultDef);
 					}
 				}
 			}
