@@ -44,6 +44,7 @@ import org.ow2.mind.adl.ast.Binding;
 import org.ow2.mind.adl.ast.BindingContainer;
 import org.ow2.mind.adl.ast.Component;
 import org.ow2.mind.adl.ast.ComponentContainer;
+import org.ow2.mind.adl.ast.DefinitionReference;
 import org.ow2.mind.adl.ast.ImplementationContainer;
 import org.ow2.mind.cli.CmdFlag;
 import org.ow2.mind.cli.InvalidCommandLineException;
@@ -288,6 +289,8 @@ public class Launcher  extends org.ow2.mind.Launcher {
 					// for all identical or modified sub-component definitions (but not the completely new or old)
 					Definition subResultDef = compareDefinitionTrees(currBaseSubDef, currHeadSubDef, baseContext, headContext);
 					ASTHelper.setResolvedComponentDefinition(cloneComp, subResultDef);
+					DefinitionReference subResultDefRef = ASTHelper.newDefinitionReference(nodeFactoryItf, subResultDef.getName());
+					ASTHelper.setResolvedDefinition(subResultDefRef, subResultDef);
 				}
 			}
 		}
