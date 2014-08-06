@@ -110,45 +110,7 @@ public class DumpDotGenerator {
 			DotWriter currentDot = injector.getInstance(DotWriter.class); 
 			currentDot.init(buildDir, instanceName, component, context);
 
-			TreeSet<MindInterface> interfaces = new TreeSet<MindInterface>(new MindInterfaceComparator());
-			for (Interface itf : ((InterfaceContainer) definition).getInterfaces())
-				interfaces.add((MindInterface) itf); 
-
-			for (MindInterface itf : interfaces) {
-				
-				String itfSource = idlLoaderItf.load(itf.getSignature(), context).astGetSource();
-				int i = itfSource.lastIndexOf(":");
-				itfSource = itfSource.substring(0,i);
-				File itfFile=new File(itfSource);
-				itfSource = itfFile.getAbsolutePath();
-				
-				String color = "";
-				
-				if (itf.getRole().equals(TypeInterface.SERVER_ROLE)) {
-					
-					color = "black";
-					if (DiffHelper.isNewInterface((Interface) itf))
-						color = "chartreuse3";
-					else if (DiffHelper.isOldInterface((Interface) itf))
-						color = "red3";
-					else if (DiffHelper.hasInterfaceDefinitionChanged(itf))
-						color = "darkgoldenrod2";
-					
-					currentDot.addServer(itf.getName(), itfSource, color);
-				}
-				if (itf.getRole().equals(TypeInterface.CLIENT_ROLE)) {
-					
-					color = "black";
-					if (DiffHelper.isNewInterface((Interface) itf))
-						color = "chartreuse3";
-					else if (DiffHelper.isOldInterface((Interface) itf))
-						color = "green3";
-					else if (DiffHelper.hasInterfaceDefinitionChanged(itf))
-						color = "darkgoldenrod2";
-					
-					currentDot.addClient(itf.getName(), itfSource, color);
-				}
-			}
+			showInterfaces(definition, currentDot);
 
 			if (ASTHelper.isComposite(definition)) {
 				showComposite(definition, instanceName, currentDot);
@@ -163,7 +125,50 @@ public class DumpDotGenerator {
 
 	}
 
+	private void showInterfaces(Definition definition,
+			DotWriter currentDot) throws ADLException {
+		
+		TreeSet<MindInterface> interfaces = new TreeSet<MindInterface>(new MindInterfaceComparator());
+		for (Interface itf : ((InterfaceContainer) definition).getInterfaces())
+			interfaces.add((MindInterface) itf); 
 
+		for (MindInterface itf : interfaces) {
+			
+			String itfSource = idlLoaderItf.load(itf.getSignature(), context).astGetSource();
+			int i = itfSource.lastIndexOf(":");
+			itfSource = itfSource.substring(0,i);
+			File itfFile=new File(itfSource);
+			itfSource = itfFile.getAbsolutePath();
+			
+			String color = "";
+			
+			if (itf.getRole().equals(TypeInterface.SERVER_ROLE)) {
+				
+				color = "black";
+				if (DiffHelper.isNewInterface((Interface) itf))
+					color = "chartreuse3";
+				else if (DiffHelper.isOldInterface((Interface) itf))
+					color = "red3";
+				else if (DiffHelper.hasInterfaceDefinitionChanged(itf))
+					color = "darkgoldenrod2";
+				
+				currentDot.addServer(itf.getName(), itfSource, color);
+			}
+			if (itf.getRole().equals(TypeInterface.CLIENT_ROLE)) {
+				
+				color = "black";
+				if (DiffHelper.isNewInterface((Interface) itf))
+					color = "chartreuse3";
+				else if (DiffHelper.isOldInterface((Interface) itf))
+					color = "red3";
+				else if (DiffHelper.hasInterfaceDefinitionChanged(itf))
+					color = "darkgoldenrod2";
+				
+				currentDot.addClient(itf.getName(), itfSource, color);
+			}
+		}
+		
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -188,6 +193,8 @@ public class DumpDotGenerator {
 		DotWriter topDot = injector.getInstance(DotWriter.class);
 		topDot.init(buildDir, topLevelName, null, context);
 
+		showInterfaces(definition, topDot);
+		
 		if (ASTHelper.isComposite(definition)) {
 			showComposite(definition, topLevelName, topDot);
 		} else if (ASTHelper.isPrimitive(definition)) {

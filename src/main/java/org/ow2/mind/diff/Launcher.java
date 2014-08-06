@@ -172,7 +172,7 @@ public class Launcher  extends org.ow2.mind.Launcher {
 
 		// Do the job
 		try {logger.info("Starting component definition trees analysis...");
-			resultDefinitionTree = compareDefinitionTrees(baseArchDef, headArchDef, baseContext, headContext);
+		resultDefinitionTree = compareDefinitionTrees(baseArchDef, headArchDef, baseContext, headContext);
 		logger.info("Finished.");
 		} catch (ADLException e) {
 			logger.severe("Error: could not compare definitions !");
@@ -241,7 +241,7 @@ public class Launcher  extends org.ow2.mind.Launcher {
 				result = (Definition) CommonASTHelper.turnsTo(result, ImplementationContainer.class, nodeFactoryItf, nodeMergerItf);
 
 				// Are sources and data different ?
-				
+
 				// test should always return true
 				if (baseArchDef instanceof ImplementationContainer && headArchDef instanceof ImplementationContainer)
 					result = comparePrimitivesContent((ImplementationContainer) baseArchDef, (ImplementationContainer) headArchDef, baseContext, headContext, (ImplementationContainer) result);
@@ -318,18 +318,23 @@ public class Launcher  extends org.ow2.mind.Launcher {
 				if (currHeadInterface.getName().equals(currBaseInterface.getName())) {
 					// Instance is common to BASE and HEAD
 
-					// Remove reference from list, so that in the end we know all the remaining ones (not found in HEAD)
-					// and treat them specially
-					baseInterfacesList.remove(currBaseInterface);
-					headInterfacesList.remove(currHeadInterface);
 
-					// Add a clone of the sub-component in our new definition
-					Interface cloneItf = NodeUtil.cloneNode(currHeadInterface);
-					result.addInterface(cloneItf);
+					// Two interfaces can have the same instance name but having changed role ! (provided -> required / required -> provided)
+					if (currHeadInterface.getRole().equals(currBaseInterface.getRole())) {
 
-					// If the common instance has a different definition, signal it and do sub-diff
-					if (!currBaseInterface.getSignature().equals(currBaseInterface.getSignature()))
-						DiffHelper.setInterfaceDefinitionChanged(cloneItf);
+						// Remove reference from list, so that in the end we know all the remaining ones (not found in HEAD)
+						// and treat them specially
+						baseInterfacesList.remove(currBaseInterface);
+						headInterfacesList.remove(currHeadInterface);
+
+						// Add a clone of the sub-component in our new definition
+						Interface cloneItf = NodeUtil.cloneNode(currHeadInterface);
+						result.addInterface(cloneItf);
+
+						// If the common instance has a different definition, signal it and do sub-diff
+						if (!currBaseInterface.getSignature().equals(currBaseInterface.getSignature()))
+							DiffHelper.setInterfaceDefinitionChanged(cloneItf);
+					}
 
 				}
 			}
@@ -548,13 +553,13 @@ public class Launcher  extends org.ow2.mind.Launcher {
 				// file
 				String currHeadSourcePath = currHeadSource.getPath();
 				String currBaseSourcePath = currBaseSource.getPath();
-				
+
 				// inline
 				String currHeadSourceCCode = currHeadSource.getCCode();
 				String currBaseSourceCCode = currBaseSource.getCCode();
 
 				if (currHeadSourcePath != null && currBaseSourcePath != null) {
-					
+
 					// only file name comparison, not content
 					if (currHeadSource.getPath().equals(currBaseSourcePath)) {
 						// Instance is common to BASE and HEAD
