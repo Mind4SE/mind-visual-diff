@@ -51,14 +51,14 @@ public class ArchitecturesComparator {
 	protected Loader 				loaderItf;
 	protected NodeFactory			nodeFactoryItf;
 	protected NodeMerger 			nodeMergerItf;
-	
-	
+
+
 	public ArchitecturesComparator(Loader loaderItf, NodeFactory nodeFactoryItf, NodeMerger nodeMergerItf) {
 		this.loaderItf = loaderItf;
 		this.nodeFactoryItf = nodeFactoryItf;
 		this.nodeMergerItf = nodeMergerItf;			
 	}
-	
+
 	/**
 	 * Create a new Definition based on the "HEAD" version (latest), enriched with
 	 * information about created/removed sub nodes, for later serialization. 
@@ -67,7 +67,7 @@ public class ArchitecturesComparator {
 	 * @param headArchDef the new definition
 	 * @param baseContext the compiler context for the old definition
 	 * @param headContext the compiler context for the new definition
-	 * @return
+	 * @return the newly created definition, with merged nodes from head and base, decorated with diff information (@see DiffHelper for decorations primitives)
 	 * @throws ADLException 
 	 */
 	public Definition compareDefinitionTrees(Definition baseArchDef,
@@ -470,5 +470,5 @@ public class ArchitecturesComparator {
 		return (Definition) result;
 
 	}
-	
+
 }
