@@ -23,8 +23,10 @@
 package org.ow2.mind.diff;
 
 import org.objectweb.fractal.adl.Definition;
+import org.objectweb.fractal.adl.interfaces.Interface;
 import org.ow2.mind.adl.ast.Binding;
 import org.ow2.mind.adl.ast.Component;
+import org.ow2.mind.adl.ast.Source;
 
 public class DiffHelper {
 
@@ -172,6 +174,85 @@ public class DiffHelper {
 		Object noMoreBindingContainerDecoration = definition.astGetDecoration(noMoreBindingContainer);
 		if (noMoreBindingContainerDecoration != null)
 			return ((Boolean) noMoreBindingContainerDecoration).booleanValue();
+		return false;
+	}
+
+	
+	/** Decoration name */
+	private static String oldInterface = "is-old-interface";
+	
+	/** Decoration name */
+	private static String newInterface = "is-new-interface";
+	
+	public static void setIsOldInterface(Interface itf) {
+		itf.astSetDecoration(oldInterface, true);		
+	}
+	
+	public static void setIsNewInterface(Interface itf) {
+		itf.astSetDecoration(newInterface, true);		
+	}
+	
+	public static boolean isOldInterface(Interface itf) {
+		Object oldInterfaceDecoration = itf.astGetDecoration(oldInterface);
+		if (oldInterfaceDecoration != null)
+			return ((Boolean) oldInterfaceDecoration).booleanValue();
+		return false;
+	}
+	
+	public static boolean isNewInterface(Interface itf) {
+		Object newInterfaceDecoration = itf.astGetDecoration(newInterface);
+		if (newInterfaceDecoration != null)
+			return ((Boolean) newInterfaceDecoration).booleanValue();
+		return false;
+	}
+
+	
+	/** Decoration name */
+	private static String interfaceDefinitionChanged = "interface-definition-changed";
+
+	/**
+	 * Decorate the definition to reflect diff status:
+	 * BASE sub-component definition != HEAD sub-component definition.
+	 * @param definition
+	 */
+	public static void setInterfaceDefinitionChanged(
+			Interface itf) {
+		itf.astSetDecoration(interfaceDefinitionChanged, true);
+	}
+	
+	public static boolean hasInterfaceDefinitionChanged(Interface itf) {
+		Object interfaceDefinitionChangedDecoration = itf.astGetDecoration(interfaceDefinitionChanged);
+		if (interfaceDefinitionChangedDecoration != null)
+			return ((Boolean) interfaceDefinitionChangedDecoration).booleanValue();
+		return false;
+	}
+
+	
+	/** Decoration name */
+	private static String oldSource = "is-old-source";
+	
+	/** Decoration name */
+	private static String newSource = "is-new-source";
+	
+	public static void setIsOldSource(Source source) {
+		source.astSetDecoration(oldSource, true);		
+	}
+
+	public static void setIsNewSource(Source source) {
+		source.astSetDecoration(newSource, true);	
+	}
+	
+	public static boolean isOldSource(Source source) {
+		Object oldSourceDecoration = source.astGetDecoration(oldSource);
+		if (oldSourceDecoration != null)
+			return ((Boolean) oldSourceDecoration).booleanValue();
+		return false;
+	}
+	
+	public static boolean isNewSource(Source source) {
+		Object newSourceDecoration = source.astGetDecoration(newSource);
+		if (newSourceDecoration != null)
+			return ((Boolean) newSourceDecoration).booleanValue();
 		return false;
 	}
 	

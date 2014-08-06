@@ -195,15 +195,15 @@ public class DotWriter {
 			final Definition definition = ASTHelper.getResolvedDefinition(defRef, adlLoaderItf, context);
 			
 			// default
-			String color = "lightgrey";
+			String color = "black";
 			if (DiffHelper.isNewComponent(component))
-				color = "chartreuse";
+				color = "chartreuse3";
 			else if (DiffHelper.isOldComponent(component))
-				color = "crimson";
+				color = "red3";
 			else if (DiffHelper.hasSubCompDefChanged(component))
-				color = "deepskyblue";
+				color = "darkgoldenrod2";
 			
-			currentPrinter.print(component.getName() + "Comp [URL=\"" + compName + "." + component.getName() + ".gv\",shape=Mrecord,style=filled,fillcolor=" + color + ",label=\"" + component.getName() + " | {{ " );
+			currentPrinter.print(component.getName() + "Comp [URL=\"" + compName + "." + component.getName() + ".gv\",shape=Mrecord,style=filled,fillcolor=lightgrey,color=" + color + ",label=\"" + component.getName() + " | {{ " );
 			if (definition instanceof InterfaceContainer) {
 
 				TreeSet<MindInterface> interfaces = new TreeSet<MindInterface>(new MindInterfaceComparator());
@@ -282,8 +282,15 @@ public class DotWriter {
 			URL url = implementationLocatorItf.findSource(srcPath, context);
 			String s;
 			File f; f = new File( url.getPath() );
+			
+			String color = "black";
+			if (DiffHelper.isNewSource(source))
+				color = "chartreuse3";
+			else if (DiffHelper.isOldSource(source))
+				color = "red3";
+			
 			s = "\", URL=\"" + f.getAbsolutePath() + "\"";
-			srcs=srcs + srcNb + "[shape=note,label=\"" + source.getPath() + s + "];\n";
+			srcs=srcs + srcNb + "[shape=note,label=\"" + source.getPath() + s + ",color="+ color +"];\n";
 			srcNb++;
 		}
 	}
@@ -293,8 +300,8 @@ public class DotWriter {
 	 * @param itfName : the name of the interface instance (as on the "provides" line in ADL)
 	 * @param itfURI : the source file path for the .itf file.
 	 */
-	public void addServer(String itfName, String itfURI) {
-		srvItfs=srvItfs + "Srv" + itfName + " [shape=Mrecord,style=filled,fillcolor=red,label=\"" + itfName + "\", URL=\"" + itfURI + "\", height=1 ];";
+	public void addServer(String itfName, String itfURI, String color) {
+		srvItfs=srvItfs + "Srv" + itfName + " [shape=record,style=filled,fillcolor=firebrick2,penwidth=2,color=" + color + ",label=\"" + itfName + "\", URL=\"" + itfURI + "\", height=1 ];";
 		srvItfsNb++;
 	}
 
@@ -302,9 +309,10 @@ public class DotWriter {
 	 * Add a client interface to the graphviz source code.
 	 * @param itfName : the name of the interface instance (as on the "requires" line in ADL)
 	 * @param itfURI : the source file path for the .itf file.
+	 * @param color 
 	 */
-	public void addClient(String itfName, String itfURI) {
-		cltItfs=cltItfs + "Clt" + itfName + " [shape=Mrecord,style=filled,fillcolor=green,label=\"" + itfName + "\", URL=\"" + itfURI + "\", height=1 ];";
+	public void addClient(String itfName, String itfURI, String color) {
+		cltItfs=cltItfs + "Clt" + itfName + " [shape=record,style=filled,fillcolor=palegreen,penwidth=2,color=" + color + ",label=\"" + itfName + "\", URL=\"" + itfURI + "\", height=1 ];";
 		cltItfsNb++;	
 	}
 

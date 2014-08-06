@@ -25,7 +25,6 @@ package org.ow2.mind.diff.dot;
 import java.io.File;
 import java.util.Map;
 import java.util.TreeSet;
-import java.util.logging.Logger;
 
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.adl.Definition;
@@ -33,7 +32,6 @@ import org.objectweb.fractal.adl.Loader;
 import org.objectweb.fractal.adl.interfaces.Interface;
 import org.objectweb.fractal.adl.interfaces.InterfaceContainer;
 import org.objectweb.fractal.adl.types.TypeInterface;
-import org.objectweb.fractal.adl.util.FractalADLLogManager;
 import org.ow2.mind.adl.ast.ASTHelper;
 import org.ow2.mind.adl.ast.Binding;
 import org.ow2.mind.adl.ast.BindingContainer;
@@ -42,6 +40,7 @@ import org.ow2.mind.adl.ast.ComponentContainer;
 import org.ow2.mind.adl.ast.ImplementationContainer;
 import org.ow2.mind.adl.ast.MindInterface;
 import org.ow2.mind.adl.ast.Source;
+import org.ow2.mind.diff.DiffHelper;
 import org.ow2.mind.diff.Launcher;
 import org.ow2.mind.idl.IDLLoader;
 import org.ow2.mind.io.BasicOutputFileLocator;
@@ -116,16 +115,38 @@ public class DumpDotGenerator {
 				interfaces.add((MindInterface) itf); 
 
 			for (MindInterface itf : interfaces) {
+				
 				String itfSource = idlLoaderItf.load(itf.getSignature(), context).astGetSource();
 				int i = itfSource.lastIndexOf(":");
 				itfSource = itfSource.substring(0,i);
 				File itfFile=new File(itfSource);
 				itfSource = itfFile.getAbsolutePath();
+				
+				String color = "";
+				
 				if (itf.getRole().equals(TypeInterface.SERVER_ROLE)) {
-					currentDot.addServer(itf.getName(), itfSource);
+					
+					color = "black";
+					if (DiffHelper.isNewInterface((Interface) itf))
+						color = "chartreuse3";
+					else if (DiffHelper.isOldInterface((Interface) itf))
+						color = "red3";
+					else if (DiffHelper.hasInterfaceDefinitionChanged(itf))
+						color = "darkgoldenrod2";
+					
+					currentDot.addServer(itf.getName(), itfSource, color);
 				}
 				if (itf.getRole().equals(TypeInterface.CLIENT_ROLE)) {
-					currentDot.addClient(itf.getName(), itfSource);
+					
+					color = "black";
+					if (DiffHelper.isNewInterface((Interface) itf))
+						color = "chartreuse3";
+					else if (DiffHelper.isOldInterface((Interface) itf))
+						color = "green3";
+					else if (DiffHelper.hasInterfaceDefinitionChanged(itf))
+						color = "darkgoldenrod2";
+					
+					currentDot.addClient(itf.getName(), itfSource, color);
 				}
 			}
 
