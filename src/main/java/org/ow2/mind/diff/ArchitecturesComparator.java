@@ -275,6 +275,11 @@ public class ArchitecturesComparator {
 			Component cloneComp = NodeUtil.cloneNode(currComponent);
 			DiffHelper.setIsOldComponent(cloneComp);
 			result.addComponent(cloneComp);
+			
+			// post-treatment
+			// we need to decorate all sub-nodes as being old as well
+			Definition currBaseSubDef = ASTHelper.getResolvedComponentDefinition(cloneComp, loaderItf, baseContext);
+			decorateAllSubNodesAsOld(currBaseSubDef, baseContext);
 		}
 
 		// all the remaining referenced components exist in HEAD but not in BASE
@@ -282,6 +287,11 @@ public class ArchitecturesComparator {
 			Component cloneComp = NodeUtil.cloneNode(currComponent);
 			DiffHelper.setIsNewComponent(cloneComp);
 			result.addComponent(cloneComp);
+			
+			// post-treatment
+			// we need to decorate all sub-nodes as being new as well
+			Definition currHeadSubDef = ASTHelper.getResolvedComponentDefinition(cloneComp, loaderItf, headContext);
+			decorateAllSubNodesAsNew(currHeadSubDef, headContext);
 		}
 
 		//-- 2) handle bindings
@@ -291,7 +301,7 @@ public class ArchitecturesComparator {
 
 				// Let's do the job
 				result = (ComponentContainer) CommonASTHelper.turnsTo((Definition) result, BindingContainer.class, nodeFactoryItf, nodeMergerItf);
-				compareBindings((BindingContainer) baseArchDef, (BindingContainer) headArchDef, baseContext, headContext, (BindingContainer) result);
+				result = (ComponentContainer) compareBindings((BindingContainer) baseArchDef, (BindingContainer) headArchDef, baseContext, headContext, (BindingContainer) result);
 
 			} else {
 				// Was BindingContainer -> No more
@@ -329,7 +339,57 @@ public class ArchitecturesComparator {
 
 	}
 
-	private void compareBindings(BindingContainer baseArchDef,
+	private void decorateAllSubNodesAsNew(Definition currHeadSubDef, Map<Object, Object> headContext) throws ADLException {
+		
+		if (currHeadSubDef instanceof InterfaceContainer)
+			for (Interface currItf : ((InterfaceContainer) currHeadSubDef).getInterfaces())
+				DiffHelper.setIsNewInterface(currItf);
+		
+		if (currHeadSubDef instanceof BindingContainer)
+			for (Binding currBinding : ((BindingContainer) currHeadSubDef).getBindings())
+				DiffHelper.setIsNewBinding(currBinding);
+		
+		if (currHeadSubDef instanceof ImplementationContainer)
+			for (Source currSource : ((ImplementationContainer) currHeadSubDef).getSources())
+				DiffHelper.setIsNewSource(currSource);
+		
+		if (currHeadSubDef instanceof ComponentContainer)
+			for (Component currComp : ((ComponentContainer) currHeadSubDef).getComponents()) {
+				DiffHelper.setIsNewComponent(currComp);
+				Definition currCompDef = ASTHelper.getResolvedComponentDefinition(currComp, loaderItf, headContext);
+				
+				// recursion
+				decorateAllSubNodesAsNew(currCompDef, headContext);
+			}
+		
+	}
+
+	private void decorateAllSubNodesAsOld(Definition currBaseSubDef, Map<Object, Object> baseContext) throws ADLException {
+		
+		if (currBaseSubDef instanceof InterfaceContainer)
+			for (Interface currItf : ((InterfaceContainer) currBaseSubDef).getInterfaces())
+				DiffHelper.setIsOldInterface(currItf);
+		
+		if (currBaseSubDef instanceof BindingContainer)
+			for (Binding currBinding : ((BindingContainer) currBaseSubDef).getBindings())
+				DiffHelper.setIsOldBinding(currBinding);
+		
+		if (currBaseSubDef instanceof ImplementationContainer)
+			for (Source currSource : ((ImplementationContainer) currBaseSubDef).getSources())
+				DiffHelper.setIsOldSource(currSource);
+		
+		if (currBaseSubDef instanceof ComponentContainer)
+			for (Component currComp : ((ComponentContainer) currBaseSubDef).getComponents()) {
+				DiffHelper.setIsOldComponent(currComp);
+				Definition currCompDef = ASTHelper.getResolvedComponentDefinition(currComp, loaderItf, baseContext);
+				
+				// recursion
+				decorateAllSubNodesAsOld(currCompDef, baseContext);
+			}
+		
+	}
+
+	private BindingContainer compareBindings(BindingContainer baseArchDef,
 			BindingContainer headArchDef, Map<Object, Object> baseContext,
 			Map<Object, Object> headContext, BindingContainer result) throws ADLException {
 
@@ -394,6 +454,7 @@ public class ArchitecturesComparator {
 			result.addBinding(cloneBinding);
 		}
 
+		return result;
 	}
 
 	private Definition comparePrimitivesContent(ImplementationContainer baseArchDef,

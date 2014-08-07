@@ -106,7 +106,9 @@ public class DotWriter {
 	 * Used for the edges (helps visual identification)
 	 */
 	private int color=1;
-	private Map<Object, Object> context;
+
+	private Map<Object, Object> baseContext;
+	private Map<Object, Object> headContext;
 
 	/**
 	 * Key used for Named Google Guice binding
@@ -124,10 +126,13 @@ public class DotWriter {
 	 * @param dir the build directory for the output file
 	 * @param name the full instance name (path in the instance diagram)
 	 * @param component The "type" of the component
+	 * @param headContext 
 	 * @param cont the context
 	 */
-	public void init(String dir, String name, Component component, Map<Object, Object> context) {
-		this.context = context;
+	public void init(String dir, String name, Component component, Map<Object, Object> baseContext, Map<Object, Object> headContext) {
+		this.baseContext = baseContext;
+		this.headContext = headContext;
+
 		try {
 			compName = name;
 			final int i = name.lastIndexOf('.');
@@ -142,8 +147,14 @@ public class DotWriter {
 			String adlSource = null;
 			if (component!=null)
 				try {
+
 					//get adlSource in the form /absolute/path/comp.adl:[line,column]-[line,column]
-					adlSource = ASTHelper.getResolvedDefinition(component.getDefinitionReference(), adlLoaderItf, context).astGetSource();
+					if (DiffHelper.isOldComponent(component))
+						adlSource = ASTHelper.getResolvedDefinition(component.getDefinitionReference(), adlLoaderItf, baseContext).astGetSource();
+					else
+						// if isNewComponent or hasSubCompDefChanged or has not changed at all (no decoration), use the latest context  
+						adlSource = ASTHelper.getResolvedDefinition(component.getDefinitionReference(), adlLoaderItf, headContext).astGetSource();
+
 					//removing line information. (using lastIndexOf instead of split[0] as ":" is a valid path character)
 					if (adlSource != null) // Do  not test os if the source is null 
 					{
@@ -192,17 +203,27 @@ public class DotWriter {
 			int clientItf = 0;
 			int serverItf = 0;
 			DefinitionReference defRef = component.getDefinitionReference();
-			final Definition definition = ASTHelper.getResolvedDefinition(defRef, adlLoaderItf, context);
-			
-			// default
-			String color = "black";
-			if (DiffHelper.isNewComponent(component))
-				color = "chartreuse3";
-			else if (DiffHelper.isOldComponent(component))
+			Definition definition = null;
+			String color = null;
+
+			if (DiffHelper.isOldComponent(component)) {
+				// if old definition, use the old info
+				definition = ASTHelper.getResolvedDefinition(defRef, adlLoaderItf, baseContext);
 				color = "red3";
-			else if (DiffHelper.hasSubCompDefChanged(component))
-				color = "darkgoldenrod2";
-			
+			} else {
+				// if new or changed or no change, use the new info
+				definition = ASTHelper.getResolvedDefinition(defRef, adlLoaderItf, headContext);
+				
+				if (DiffHelper.isNewComponent(component)) {
+					color = "chartreuse3"; 
+				} else if (DiffHelper.hasSubCompDefChanged(component)) {
+					color = "darkgoldenrod2";
+				} else {
+					// no change
+					color = "black";
+				}
+			}
+
 			currentPrinter.print(component.getName() + "Comp [URL=\"" + compName + "." + component.getName() + ".gv\",shape=Mrecord,style=filled,fillcolor=lightgrey,color=" + color + ",label=\"" + component.getName() + " | {{ " );
 			if (definition instanceof InterfaceContainer) {
 
@@ -216,7 +237,7 @@ public class DotWriter {
 					if (itf.getRole().equals(TypeInterface.SERVER_ROLE)) {
 						if ( serverItf !=0 )
 							currentPrinter.print(" | ");
-						
+
 						// label changes whether intefaces still exists, doesn't exist anymore, or is new
 						// we do this since with our viewer we cannot set a different color for elements of a record
 						String label = itf.getName();
@@ -226,7 +247,7 @@ public class DotWriter {
 							label = "-- " + label;
 						else if (DiffHelper.hasInterfaceDefinitionChanged(itf))
 							label = "<> " + label;
-						
+
 						currentPrinter.print("<" + itf.getName() + "> " + label);
 						serverItf++;
 						//itf.getSignature()); //TODO might put this info somwhere latter
@@ -239,7 +260,7 @@ public class DotWriter {
 					if (itf.getRole().equals(TypeInterface.CLIENT_ROLE)) {
 						if ( clientItf !=0 )
 							currentPrinter.print(" | ");
-						
+
 						// label changes whether intefaces still exists, doesn't exist anymore, or is new
 						// we do this since with our viewer we cannot set a different color for elements of a record
 						String label = itf.getName();
@@ -249,7 +270,7 @@ public class DotWriter {
 							label = label + " --";
 						else if (DiffHelper.hasInterfaceDefinitionChanged(itf))
 							label = label + " <>";
-						
+
 						currentPrinter.print("<" + itf.getName() + "> " + label);
 						clientItf++;
 						//itf.getSignature());
@@ -271,13 +292,13 @@ public class DotWriter {
 	 * @param binding : the Binding
 	 */
 	public void addBinding(Binding binding) {
-		
+
 		color = 9;
 		if (DiffHelper.isNewBinding(binding))
 			color = 3;
 		else if (DiffHelper.isOldBinding(binding))
 			color = 1;
-		
+
 		String fc = binding.getFromComponent();
 		String fi = binding.getFromInterface();
 		String tc = binding.getToComponent();
@@ -301,18 +322,27 @@ public class DotWriter {
 	 * @param source : the source File
 	 */
 	public void addSource(Source source) {
-		String srcPath=source.getPath();
+		String srcPath = source.getPath();
+		
 		if (srcPath != null) {
-			URL url = implementationLocatorItf.findSource(srcPath, context);
+			
+			URL url = null;
+			
+			if (DiffHelper.isOldSource(source))
+				url = implementationLocatorItf.findSource(srcPath, baseContext);
+			else
+				// if new or changed or not changed, load from latest context
+				url = implementationLocatorItf.findSource(srcPath, headContext);
+			
 			String s;
 			File f; f = new File( url.getPath() );
-			
+
 			String color = "black";
 			if (DiffHelper.isNewSource(source))
 				color = "chartreuse3";
 			else if (DiffHelper.isOldSource(source))
 				color = "red3";
-			
+
 			s = "\", URL=\"" + f.getAbsolutePath() + "\"";
 			srcs=srcs + srcNb + "[shape=note,label=\"" + source.getPath() + s + ",color="+ color +"];\n";
 			srcNb++;

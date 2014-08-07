@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.objectweb.fractal.adl.ADLException;
@@ -36,38 +37,40 @@ import org.objectweb.fractal.adl.NodeFactory;
 import org.objectweb.fractal.adl.error.Error;
 import org.objectweb.fractal.adl.merger.NodeMerger;
 import org.objectweb.fractal.adl.util.FractalADLLogManager;
-import org.ow2.mind.cli.CmdFlag;
+import org.ow2.mind.cli.CmdOptionBooleanEvaluator;
+import org.ow2.mind.cli.CmdPathOption;
+import org.ow2.mind.cli.CommandLine;
+import org.ow2.mind.cli.CommandLineOptionExtensionHelper;
 import org.ow2.mind.cli.InvalidCommandLineException;
-import org.ow2.mind.cli.Options;
 import org.ow2.mind.diff.dot.DumpDotGenerator;
+import org.ow2.mind.plugin.PluginManager;
+
+import com.google.inject.Injector;
 
 public class Launcher  extends org.ow2.mind.Launcher {
 
 	protected static final String PROGRAM_NAME_PROPERTY_NAME = "minddiff.launcher.name";
-	protected static final String ID_PREFIX                  = "org.ow2.mind.unit.test.";
+	protected static final String ID_PREFIX                  = "org.ow2.mind.diff.";
 
-	protected final CmdFlag 		helpOpt					= new CmdFlag(
-			ID_PREFIX
-			+ "Help",
-			"h", "help",
-			"Print this help and exit");
-
-	protected final CmdFlag 		versionOpt				= new CmdFlag(
-			ID_PREFIX
-			+ "Version",
-			"v", "version",
-			"Print version number and exit");
-
-	protected final CmdFlag 		extensionPointsListOpt	= new CmdFlag(
-			ID_PREFIX
-			+ "PrintExtensionPoints",
+	protected final CmdPathOption	baseSrcOpt 				= new CmdPathOption(
+			ID_PREFIX + "BaseSrcPath",
 			null,
-			"extension-points",
-			"Print the list of available extension points and exit.");
+			"base-src-path",
+			"the search path of ADL,IDL and implementation files for BASE library",
+			"&lt;path list&gt;");
 
-	protected final Options 		options					= new Options();
+	protected final CmdPathOption	headSrcOpt 				= new CmdPathOption(
+			ID_PREFIX + "HeadSrcPath",
+			null,
+			"head-src-path",
+			"the search path of ADL,IDL and implementation files for HEAD library",
+			"&lt;path list&gt;");
 
 	public static Logger			logger					= FractalADLLogManager.getLogger("visual-diff");
+
+	// compiler components
+	protected Injector            	baseInjector;
+	protected Injector            	headInjector;
 
 	protected Loader 				loaderItf;
 	protected NodeFactory			nodeFactoryItf;
@@ -79,7 +82,116 @@ public class Launcher  extends org.ow2.mind.Launcher {
 	String baseAdlName 				= null; 
 	String headAdlName 				= null;
 
+	Map<Object, Object> baseContext = null;
+	Map<Object, Object> headContext = null;
+
 	//-- compiler configuration
+
+	@Override
+	protected void addOptions(final PluginManager pluginManagerItf) {
+		options.addOptions(baseSrcOpt, headSrcOpt, helpOpt, versionOpt, extensionPointsListOpt);
+
+		options.addOptions(CommandLineOptionExtensionHelper
+				.getCommandOptions(pluginManagerItf));
+	}
+
+	@Override
+	protected void init(final String... args) throws InvalidCommandLineException {
+		if (logger.isLoggable(Level.CONFIG)) {
+			for (final String arg : args) {
+				logger.config("[arg] " + arg);
+			}
+		}
+
+		/****** Initialization of the PluginManager Component *******/
+
+		final Injector bootStrapPluginManagerInjector = getBootstrapInjector();
+		final PluginManager pluginManager = bootStrapPluginManagerInjector
+				.getInstance(PluginManager.class);
+
+		addOptions(pluginManager);
+
+		// parse arguments to a CommandLine.
+		final CommandLine cmdLine = CommandLine.parseArgs(options, false, args);
+
+		// will raise an exception on error
+		checkExclusiveGroups(pluginManager, cmdLine);
+
+		// If help is asked, print it and exit.
+		if (helpOpt.isPresent(cmdLine)) {
+			printHelp(System.out);
+			System.exit(0);
+		}
+
+		// If version is asked, print it and exit.
+		if (versionOpt.isPresent(cmdLine)) {
+			printVersion(System.out);
+			System.exit(0);
+		}
+
+		// Handle separate source-paths for the two component libraries
+		if (baseSrcOpt.isPresent(cmdLine) && headSrcOpt.isPresent(cmdLine)) {
+
+			baseContext = new HashMap<Object, Object>(compilerContext);
+			headContext = new HashMap<Object, Object>(compilerContext);
+			
+			// Create a fake command-line for head and base, one per context
+			final CommandLine baseCmdLine = CommandLine.parseArgs(options, false, args);
+			final CommandLine headCmdLine = CommandLine.parseArgs(options, false, args);
+
+			// Populate the 2 fake command lines with SrcPathOption with baseSrcOpt and headSrcOpt values
+
+			// BASE
+			CmdPathOption fakeSrcOptForBase = new CmdPathOption(
+					org.ow2.mind.Launcher.ID_PREFIX + "SrcPath",
+					"S",
+					"src-path",
+					"the search path of ADL,IDL and implementation files (list of path separated by ':' on Linux or ';' on Windows)",
+					"&lt;path list&gt;");
+			fakeSrcOptForBase.setValue(baseCmdLine, baseSrcOpt.getValue(cmdLine));
+
+
+			// HEAD
+			CmdPathOption fakeSrcOptForHead = new CmdPathOption(
+					org.ow2.mind.Launcher.ID_PREFIX + "SrcPath",
+					"S",
+					"src-path",
+					"the search path of ADL,IDL and implementation files (list of path separated by ':' on Linux or ';' on Windows)",
+					"&lt;path list&gt;");
+			fakeSrcOptForHead.setValue(headCmdLine, headSrcOpt.getValue(cmdLine));
+
+			// to each context its own src-path
+			baseContext.put(CmdOptionBooleanEvaluator.CMD_LINE_CONTEXT_KEY, baseCmdLine);
+			headContext.put(CmdOptionBooleanEvaluator.CMD_LINE_CONTEXT_KEY, headCmdLine);
+
+			// invokeOptionHandlers with both contexts
+			invokeOptionHandlers(pluginManager, baseCmdLine, baseContext);
+			invokeOptionHandlers(pluginManager, headCmdLine, headContext);
+
+			// invoke for default context (pure conf)
+			compilerContext
+				.put(CmdOptionBooleanEvaluator.CMD_LINE_CONTEXT_KEY, cmdLine);
+			invokeOptionHandlers(pluginManager, cmdLine, compilerContext);
+		} else {
+			// Expect standard --src-path
+			compilerContext
+			.put(CmdOptionBooleanEvaluator.CMD_LINE_CONTEXT_KEY, cmdLine);
+			
+			// invoke for default context
+			invokeOptionHandlers(pluginManager, cmdLine, compilerContext);
+			
+			baseContext = new HashMap<Object, Object>(compilerContext);
+			headContext = new HashMap<Object, Object>(compilerContext);
+		}
+
+		// get list of ADL
+		adlToExecName = parserADLList(cmdLine.getArguments(), cmdLine);
+
+		// initialize compiler
+		initInjector(pluginManager, compilerContext);
+
+		initCompiler();
+	}
 
 	/**
 	 * Here we use the standard compiler initialization + A number of internals usually coming later.
@@ -107,11 +219,6 @@ public class Launcher  extends org.ow2.mind.Launcher {
 		Definition baseArchDef = null;
 		Definition headArchDef = null;
 
-		// Create copies for separate manipulations and loading
-		// This allows loading the same fully-qualified-name definition from different sources
-		Map<Object, Object> baseContext = new HashMap<Object, Object>(compilerContext);
-		Map<Object, Object> headContext = new HashMap<Object, Object>(compilerContext);
-
 		if (adlToExecName.size() == 0) {
 			throw new InvalidCommandLineException("no definition name is specified.",
 					1);
@@ -127,9 +234,6 @@ public class Launcher  extends org.ow2.mind.Launcher {
 			throw new InvalidCommandLineException("too many arguments were specified.",
 					1);
 
-		// Note: How to handle separate source-paths for the two component libraries ?
-		// TODO: introduce --base-src-path and --head-src-path
-
 		final List<Object> result = new ArrayList<Object>();
 
 		logger.info("Launching graphical diff files generation...");
@@ -137,25 +241,18 @@ public class Launcher  extends org.ow2.mind.Launcher {
 
 		// load both definitions
 		try {
+			logger.info("Loading BASE architecture...");
 			baseArchDef = loaderItf.load(baseAdlName, baseContext);
-		} catch (ADLException e) {
-			logger.severe("Error: could not load BASE definition");
-		}
-
-		try {
+			logger.info("Loading HEAD architecture...");
 			headArchDef = loaderItf.load(headAdlName, headContext);
-		} catch (ADLException e) {
-			logger.severe("Error: could not load HEAD definition");
-		}
 
-		// Do the job
-		try {
+			// Do the job
 			logger.info("Starting component definition trees analysis...");
 			ArchitecturesComparator archComparator = new ArchitecturesComparator(loaderItf, nodeFactoryItf, nodeMergerItf);
 			resultDefinitionTree = archComparator.compareDefinitionTrees(baseArchDef, headArchDef, baseContext, headContext);
 			logger.info("Finished.");
 		} catch (ADLException e) {
-			logger.severe("Error: could not compare definitions !");
+			logger.severe("An error occured: ");
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}		
@@ -163,7 +260,7 @@ public class Launcher  extends org.ow2.mind.Launcher {
 
 		DumpDotGenerator dotGenerator = injector.getInstance(DumpDotGenerator.class);
 		try {
-			dotGenerator.generateDot(resultDefinitionTree, compilerContext);
+			dotGenerator.generateDot(resultDefinitionTree, baseContext, headContext);
 			logger.info("Successful.");
 		} catch (ADLException e) {
 			logger.severe("Error: could not generate .gv files !");

@@ -66,7 +66,9 @@ public class DumpDotGenerator {
 	@Inject
 	protected Loader adlLoaderItf;
 
-	private Map<Object,Object> context;
+	private Map<Object,Object> baseContext;
+	private Map<Object,Object> headContext;
+	
 	private String buildDir;
 
 	private void showComposite(final Definition definition, String instanceName, DotWriter currentDot) {
@@ -103,12 +105,18 @@ public class DumpDotGenerator {
 	private void showComponents(final Component component, String instanceName) {
 
 		try {
-			final Definition definition = ASTHelper.getResolvedDefinition(component
-					.getDefinitionReference(), adlLoaderItf, context);
+			Definition definition = null;
+			
+			if (DiffHelper.isOldComponent(component))
+				definition = ASTHelper.getResolvedDefinition(component.getDefinitionReference(), adlLoaderItf, baseContext);
+			else
+				// if is new or changed type or unchanged, use latest context
+				definition = ASTHelper.getResolvedDefinition(component.getDefinitionReference(), adlLoaderItf, headContext);
+				
 			instanceName = instanceName + "." + component.getName();
 
 			DotWriter currentDot = injector.getInstance(DotWriter.class); 
-			currentDot.init(buildDir, instanceName, component, context);
+			currentDot.init(buildDir, instanceName, component, baseContext, headContext);
 
 			showInterfaces(definition, currentDot);
 
@@ -128,13 +136,23 @@ public class DumpDotGenerator {
 	private void showInterfaces(Definition definition,
 			DotWriter currentDot) throws ADLException {
 		
+		if (!(definition instanceof InterfaceContainer))
+			return;
+		
 		TreeSet<MindInterface> interfaces = new TreeSet<MindInterface>(new MindInterfaceComparator());
 		for (Interface itf : ((InterfaceContainer) definition).getInterfaces())
 			interfaces.add((MindInterface) itf); 
 
 		for (MindInterface itf : interfaces) {
 			
-			String itfSource = idlLoaderItf.load(itf.getSignature(), context).astGetSource();
+			String itfSource = null;
+			
+			if (DiffHelper.isOldInterface(itf))
+				itfSource = idlLoaderItf.load(itf.getSignature(), baseContext).astGetSource();
+			else
+				// if new or type changed or no change, use the latest context
+				itfSource = idlLoaderItf.load(itf.getSignature(), headContext).astGetSource();
+			
 			int i = itfSource.lastIndexOf(":");
 			itfSource = itfSource.substring(0,i);
 			File itfFile=new File(itfSource);
@@ -179,19 +197,21 @@ public class DumpDotGenerator {
 	 * org.objectweb.fractal.adl.Definition,
 	 * org.ow2.mind.adl.annotation.ADLLoaderPhase, java.util.Map)
 	 */
-	public Definition generateDot(Definition definition, final Map<Object, Object> context)
+	public Definition generateDot(Definition definition, final Map<Object, Object> baseContext, Map<Object, Object> headContext)
 					throws ADLException {
-		this.context = context;
+		this.baseContext = baseContext;
+		this.headContext = headContext;
 
 		Launcher.logger.info("MindDiff Graph generator: Start creating .gv files...");
 		
 		String topLevelName = "TopLevel"; //FIXME get the executable name.
 
-		buildDir = ((File) context.get(BasicOutputFileLocator.OUTPUT_DIR_CONTEXT_KEY)).getPath() +  File.separator;
+		// contexts should contain the same output dir
+		buildDir = ((File) baseContext.get(BasicOutputFileLocator.OUTPUT_DIR_CONTEXT_KEY)).getPath() +  File.separator;
 
 		// Get instance from the injector so its @Inject fields get properly injected (ADL Loader especially)
 		DotWriter topDot = injector.getInstance(DotWriter.class);
-		topDot.init(buildDir, topLevelName, null, context);
+		topDot.init(buildDir, topLevelName, null, baseContext, headContext);
 
 		showInterfaces(definition, topDot);
 		
