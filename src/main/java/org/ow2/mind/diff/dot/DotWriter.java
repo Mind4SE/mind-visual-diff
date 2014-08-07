@@ -214,8 +214,20 @@ public class DotWriter {
 				//				final MindInterface itf = (MindInterface) interfaces[i];
 				for (MindInterface itf : interfaces) {
 					if (itf.getRole().equals(TypeInterface.SERVER_ROLE)) {
-						if ( serverItf !=0 ) currentPrinter.print(" | ");
-						currentPrinter.print("<" + itf.getName() + "> " + itf.getName());
+						if ( serverItf !=0 )
+							currentPrinter.print(" | ");
+						
+						// label changes whether intefaces still exists, doesn't exist anymore, or is new
+						// we do this since with our viewer we cannot set a different color for elements of a record
+						String label = itf.getName();
+						if (DiffHelper.isNewInterface(itf))
+							label = "++ " + label;
+						else if (DiffHelper.isOldInterface(itf))
+							label = "-- " + label;
+						else if (DiffHelper.hasInterfaceDefinitionChanged(itf))
+							label = "<> " + label;
+						
+						currentPrinter.print("<" + itf.getName() + "> " + label);
 						serverItf++;
 						//itf.getSignature()); //TODO might put this info somwhere latter
 					}
@@ -225,8 +237,20 @@ public class DotWriter {
 				//				final MindInterface itf = (MindInterface) interfaces[i];	
 				for (MindInterface itf : interfaces) {	
 					if (itf.getRole().equals(TypeInterface.CLIENT_ROLE)) {
-						if ( clientItf !=0 ) currentPrinter.print(" | ");
-						currentPrinter.print("<" + itf.getName() + "> " + itf.getName());
+						if ( clientItf !=0 )
+							currentPrinter.print(" | ");
+						
+						// label changes whether intefaces still exists, doesn't exist anymore, or is new
+						// we do this since with our viewer we cannot set a different color for elements of a record
+						String label = itf.getName();
+						if (DiffHelper.isNewInterface(itf))
+							label = label + " ++";
+						else if (DiffHelper.isOldInterface(itf))
+							label = label + " --";
+						else if (DiffHelper.hasInterfaceDefinitionChanged(itf))
+							label = label + " <>";
+						
+						currentPrinter.print("<" + itf.getName() + "> " + label);
 						clientItf++;
 						//itf.getSignature());
 					}
