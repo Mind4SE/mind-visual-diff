@@ -30,7 +30,14 @@
 @echo off
 setlocal
 
+@REM use the batch path to determine MIND_HOME
+pushd %~dp0..\
+set MIND_HOME=%cd%
+popd
+
+set MIND_RUNTIME=%MIND_HOME%\runtime
+
 @REM Launcher class name
 set LAUNCHER=org.ow2.mind.diff.Launcher
-@rem echo %~dp0\jar_launcher.bat %LAUNCHER% %MIND_OPTS% -Dmindc.launcher.name=mind-diff %LAUNCHER% %*
-%~dp0\jar_launcher.bat %LAUNCHER% %MIND_OPTS% -Dmindc.launcher.name=mindc-diff %LAUNCHER% %*
+@rem echo %~dp0\jar_launcher.bat %LAUNCHER% %MIND_OPTS% -Dmindc.launcher.name=mind-diff %LAUNCHER% %* --base-src-path=%MIND_RUNTIME% --head-src-path=%MIND_RUNTIME%
+%~dp0\jar_launcher.bat %LAUNCHER% %MIND_OPTS% -Dmindc.launcher.name=mindc-diff %LAUNCHER% %* --base-src-path=%MIND_RUNTIME% --head-src-path=%MIND_RUNTIME%

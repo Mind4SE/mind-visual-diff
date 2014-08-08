@@ -23,6 +23,7 @@
 
 package org.ow2.mind.diff;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,14 +58,14 @@ public class Launcher  extends org.ow2.mind.Launcher {
 			null,
 			"base-src-path",
 			"the search path of ADL,IDL and implementation files for BASE library",
-			"&lt;path list&gt;");
+			"<path list>");
 
 	protected final CmdPathOption	headSrcOpt 				= new CmdPathOption(
 			ID_PREFIX + "HeadSrcPath",
 			null,
 			"head-src-path",
 			"the search path of ADL,IDL and implementation files for HEAD library",
-			"&lt;path list&gt;");
+			"<path list>");
 
 	public static Logger			logger					= FractalADLLogManager.getLogger("visual-diff");
 
@@ -134,7 +135,7 @@ public class Launcher  extends org.ow2.mind.Launcher {
 
 			baseContext = new HashMap<Object, Object>(compilerContext);
 			headContext = new HashMap<Object, Object>(compilerContext);
-			
+
 			// Create a fake command-line for head and base, one per context
 			final CommandLine baseCmdLine = CommandLine.parseArgs(options, false, args);
 			final CommandLine headCmdLine = CommandLine.parseArgs(options, false, args);
@@ -170,16 +171,16 @@ public class Launcher  extends org.ow2.mind.Launcher {
 
 			// invoke for default context (pure conf)
 			compilerContext
-				.put(CmdOptionBooleanEvaluator.CMD_LINE_CONTEXT_KEY, cmdLine);
+			.put(CmdOptionBooleanEvaluator.CMD_LINE_CONTEXT_KEY, cmdLine);
 			invokeOptionHandlers(pluginManager, cmdLine, compilerContext);
 		} else {
 			// Expect standard --src-path
 			compilerContext
 			.put(CmdOptionBooleanEvaluator.CMD_LINE_CONTEXT_KEY, cmdLine);
-			
+
 			// invoke for default context
 			invokeOptionHandlers(pluginManager, cmdLine, compilerContext);
-			
+
 			baseContext = new HashMap<Object, Object>(compilerContext);
 			headContext = new HashMap<Object, Object>(compilerContext);
 		}
@@ -272,6 +273,20 @@ public class Launcher  extends org.ow2.mind.Launcher {
 		if (warnings != null) warnings.addAll(errorManager.getWarnings());
 
 		return result;
+	}
+
+	@Override
+	protected void printUsage(final PrintStream ps) {
+		ps.println("Usage: ");
+		ps.println("1) " + getProgramName()
+				+ " [OPTIONS] <definition>");
+		ps.println("  where <definition> is the name of a component to"
+				+ " be compared between --base-src-path and --head-src-path versions");
+		ps.println("2) " + getProgramName()
+				+ " [OPTIONS] <baseDefinition> <headDefinition>");
+		ps.println("  where <baseDefinition> and <headDefinition> are names of components to"
+				+ " be compared either in a unique --src-path or between --base-src-path and --head-src-path");
+		ps.println("Note: Base/Head versions == Old/New");
 	}
 
 	/**

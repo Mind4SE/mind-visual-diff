@@ -28,8 +28,11 @@
 #       set MIND_OPTS=-Ddefault.console.level=FINE -Ddefault.file.level=FINER
 #   See documentation for more detail on logging system.
 
+MIND_HOME=$(cd $(dirname $0)/..; pwd)
+MIND_RUNTIME="$MIND_HOME"/runtime
+
 ## Launcher class name
 LAUNCHER=org.ow2.mind.diff.Launcher
 
-#echo $(dirname $0)/jar_launcher ${LAUNCHER} ${MIND_OPTS} -Dmindc.launcher.name=mind-diff ${LAUNCHER} "$@"
-exec $(dirname $0)/jar_launcher ${LAUNCHER} ${MIND_OPTS} -Dmindc.launcher.name=mind-diff ${LAUNCHER} "$@"
+#echo $(dirname $0)/jar_launcher ${LAUNCHER} ${MIND_OPTS} -Dmindc.launcher.name=mind-diff ${LAUNCHER} "$@" --base-src-path="${MIND_RUNTIME}" --head-src-path="${MIND_RUNTIME}"
+exec $(dirname $0)/jar_launcher ${LAUNCHER} ${MIND_OPTS} -Dmindc.launcher.name=mind-diff ${LAUNCHER} "$@" --base-src-path="${MIND_RUNTIME}" --head-src-path="${MIND_RUNTIME}"
