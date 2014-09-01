@@ -91,11 +91,35 @@ public class ArchitecturesComparator {
 			} else {
 				// Changed: Composite -> Primitive
 				DiffHelper.setDefinitionNowPrimitive(result);
+				
+				// convert as ComponentContainer and ImplementationContainer hybrid
+				result = (Definition) CommonASTHelper.turnsTo(result, ComponentContainer.class, nodeFactoryItf, nodeMergerItf);
+				result = (Definition) CommonASTHelper.turnsTo(result, ImplementationContainer.class, nodeFactoryItf, nodeMergerItf);
+				
+				// Decorate old composite content and new primitive content ('for' loops with 0 content will go fast)
+				Definition baseArchDefAsPrimitive = (Definition) CommonASTHelper.turnsTo(baseArchDef, ImplementationContainer.class, nodeFactoryItf, nodeMergerItf);
+				Definition headArchDefAsComposite = (Definition) CommonASTHelper.turnsTo(headArchDef, ComponentContainer.class, nodeFactoryItf, nodeMergerItf);
+				
+				result = compareCompositesContent((ComponentContainer) baseArchDef, (ComponentContainer) headArchDefAsComposite, baseContext, headContext, (ComponentContainer) result);
+				if (headArchDef instanceof ImplementationContainer)
+					result = comparePrimitivesContent((ImplementationContainer) baseArchDefAsPrimitive, (ImplementationContainer) headArchDef, baseContext, headContext, (ImplementationContainer) result);
 			}
 		} else {
 			if (ASTHelper.isComposite(headArchDef)) {
 				// Changed: Primitive -> Composite
 				DiffHelper.setDefinitionNowComposite(result);
+				
+				// convert as ComponentContainer and ImplementationContainer hybrid
+				result = (Definition) CommonASTHelper.turnsTo(result, ImplementationContainer.class, nodeFactoryItf, nodeMergerItf);
+				result = (Definition) CommonASTHelper.turnsTo(result, ComponentContainer.class, nodeFactoryItf, nodeMergerItf);
+				
+				// Decorate old composite content and new primitive content ('for' loops with 0 content will go fast)
+				Definition baseArchDefAsComposite = (Definition) CommonASTHelper.turnsTo(baseArchDef, ComponentContainer.class, nodeFactoryItf, nodeMergerItf);
+				Definition headArchDefAsPrimitive = (Definition) CommonASTHelper.turnsTo(headArchDef, ImplementationContainer.class, nodeFactoryItf, nodeMergerItf);
+				
+				result = compareCompositesContent((ComponentContainer) baseArchDefAsComposite, (ComponentContainer) headArchDef, baseContext, headContext, (ComponentContainer) result);
+				if (baseArchDef instanceof ImplementationContainer)
+					result = comparePrimitivesContent((ImplementationContainer) baseArchDef, (ImplementationContainer) headArchDefAsPrimitive, baseContext, headContext, (ImplementationContainer) result);
 			} else {
 				// Both Primitive
 

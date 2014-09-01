@@ -120,11 +120,18 @@ public class DumpDotGenerator {
 
 			showInterfaces(definition, currentDot);
 
-			if (ASTHelper.isComposite(definition)) {
+			/*
+			 * With Mind-Diff, a definition can be both kinds of nodes.
+			 * - If Primitive became a Composite,
+			 * - Or Composite became a Primitive
+			 */
+			
+			if (ASTHelper.isComposite(definition))
 				showComposite(definition, instanceName, currentDot);
-			} else if (ASTHelper.isPrimitive(definition)) {
+			
+			if (ASTHelper.isPrimitive(definition))
 				showPrimitive(definition, instanceName, currentDot);
-			}
+				
 			currentDot.close();
 		} catch (final ADLException e) {
 			// TODO Auto-generated catch block
@@ -215,11 +222,17 @@ public class DumpDotGenerator {
 
 		showInterfaces(definition, topDot);
 		
-		if (ASTHelper.isComposite(definition)) {
+		/*
+		 * With Mind-Diff, a definition can be both kinds of nodes.
+		 * - If Primitive became a Composite,
+		 * - Or Composite became a Primitive
+		 */
+		
+		if (ASTHelper.isComposite(definition))
 			showComposite(definition, topLevelName, topDot);
-		} else if (ASTHelper.isPrimitive(definition)) {
+		
+		if (ASTHelper.isPrimitive(definition))
 			showPrimitive(definition, topLevelName, topDot);
-		}
 		
 		topDot.close();
 		
