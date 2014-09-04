@@ -27,19 +27,19 @@
 	</dependencies>
 
 	<build>
-            <pluginManagement>
-            <plugins>
-                <!-- Use Java 1.5 -->
-                <plugin>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.1</version>
-                    <configuration>
-                        <source>1.5</source>
-                        <target>1.5</target>
-                    </configuration>
-                </plugin>
-            </plugins>
-	    </pluginManagement>
+		<pluginManagement>
+			<plugins>
+				<!-- Use Java 1.5 -->
+				<plugin>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.1</version>
+					<configuration>
+						<source>1.5</source>
+						<target>1.5</target>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -62,6 +62,143 @@
 					</execution>
 				</executions>
 			</plugin>
+			
+			<!-- Begin Docbook plugins -->
+			<plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+				<version>2.5</version>
+				<inherited>false</inherited>
+				<executions>
+					<execution>
+						<id>copy-docbook-resources</id>
+						<!-- here the phase you need -->
+						<phase>pre-site</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<inherited>false</inherited>
+						<configuration>
+							<outputDirectory>${project.build.directory}/site/images</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/src/docbkx/guide/images</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>com.agilejava.docbkx</groupId>
+				<artifactId>docbkx-maven-plugin</artifactId>
+				<inherited>false</inherited>
+				<executions>
+					<execution>
+						<id>pdf</id>
+						<phase>pre-site</phase>
+						<goals>
+							<goal>generate-pdf</goal>
+						</goals>
+						<inherited>false</inherited>
+						<configuration>
+							<targetDirectory>${project.build.directory}/site</targetDirectory>
+							<foCustomization>${basedir}/src/docbkx/xsl/minddoc-fo.xsl</foCustomization>
+							<draftWatermarkImage>${basedir}/src/docbkx/images/draft.png</draftWatermarkImage>
+						</configuration>
+					</execution>
+					<execution>
+						<id>html-printable</id>
+						<phase>pre-site</phase>
+						<goals>
+							<goal>generate-html</goal>
+						</goals>
+						<inherited>false</inherited>
+						<configuration>
+							<targetDirectory>${project.build.directory}/site/printable</targetDirectory>
+							<imgSrcPath>../</imgSrcPath>
+							<htmlCustomization>${basedir}/src/docbkx/xsl/minddoc-html-printable.xsl</htmlCustomization>
+							<htmlStylesheet>../css/docbook-printable.css</htmlStylesheet>
+						</configuration>
+					</execution>
+					<!-- User Guide HTML executions -->
+					<execution>
+						<id>userguide-html</id>
+						<phase>pre-site</phase>
+						<goals>
+							<goal>generate-html</goal>
+						</goals>
+						<inherited>false</inherited>
+						<configuration>
+							<includes>mind-diff-guide.xml</includes>
+							<targetDirectory>${project.build.directory}/site</targetDirectory>
+							<htmlCustomization>${basedir}/src/docbkx/xsl/minddoc-html.xsl</htmlCustomization>
+							<htmlStylesheet>css/docbook.css</htmlStylesheet>
+							<customizationParameters>
+								<parameter>
+									<name>root.path</name>
+									<value>.</value>
+								</parameter>
+								<parameter>
+									<name>pdf.link</name>
+									<value>mind-diff-guide.pdf</value>
+								</parameter>
+								<parameter>
+									<name>chunked.link</name>
+									<value>guide/mind-diff-guide.html</value>
+								</parameter>
+								<parameter>
+									<name>printable.link</name>
+									<value>printable/mind-diff-guide.html</value>
+								</parameter>
+							</customizationParameters>
+						</configuration>
+					</execution>
+					<execution>
+						<id>userguide-html-chunked</id>
+						<phase>pre-site</phase>
+						<goals>
+							<goal>generate-html</goal>
+						</goals>
+						<inherited>false</inherited>
+						<configuration>
+							<includes>mind-diff-guide.xml</includes>
+							<chunkedOutput>true</chunkedOutput>
+							<targetDirectory>${project.build.directory}/site/guide</targetDirectory>
+							<imgSrcPath>../</imgSrcPath>
+							<htmlCustomization>${basedir}/src/docbkx/xsl/minddoc-chunk.xsl</htmlCustomization>
+							<htmlStylesheet>../css/docbook-chunk.css</htmlStylesheet>
+							<customizationParameters>
+								<parameter>
+									<name>root.path</name>
+									<value>..</value>
+								</parameter>
+								<parameter>
+									<name>pdf.link</name>
+									<value>../mind-diff-guide.pdf</value>
+								</parameter>
+								<parameter>
+									<name>single.link</name>
+									<value>../mind-diff-guide.html</value>
+								</parameter>
+								<parameter>
+									<name>printable.link</name>
+									<value>../printable/mind-diff-guide.html</value>
+								</parameter>
+							</customizationParameters>
+						</configuration>
+					</execution>
+
+				</executions>
+				<configuration>
+					<targetDirectory>${project.build.directory}/site</targetDirectory>
+					<xslthlConfig>${basedir}/src/docbkx/xsl/xslthl-config.xml</xslthlConfig>
+					<highlightSource>1</highlightSource>
+					<xincludeSupported>true</xincludeSupported>
+				</configuration>
+			</plugin>
+			
+			<!-- End Docbook plugins -->
 		</plugins>
 	</build>
 
