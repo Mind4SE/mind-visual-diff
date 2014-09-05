@@ -5,10 +5,98 @@
 %myents;
 ]>
 <book status="draft">
-    <title>
-        <emphasis>&productName;</emphasis> Guide 
-    </title>
-    <subtitle>version <?eval ${project.version}?></subtitle>
-    
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="guide/intro.xml" />
+	<title>
+		<emphasis>&productName;</emphasis> Guide 
+	</title>
+	
+	<subtitle>version <?eval ${project.version}?></subtitle>
+
+	<chapter>
+		<title>Document history</title>
+	
+		<table frame="all">
+			<title>Document history</title>
+
+			<tgroup align="left" cols="4" colsep="0.2" rowsep="1">
+				<thead>
+					<row>
+						<entry>Version</entry>
+						<entry>Date</entry>
+						<entry>Author</entry>
+						<entry>Description</entry>
+					</row>
+				</thead>
+
+				<tbody>
+					<row>
+						<entry>0.1</entry>
+						<entry>04/09/2014</entry>
+						<entry>Stephane Seyvoz</entry>
+						<entry>Document creation</entry>
+					</row>
+				</tbody>
+			</tgroup>
+		</table>
+	</chapter>
+	
+	<chapter>
+		<title>Introduction</title>
+
+		<section>
+			<para>This example is dedicated to illustrate the usage of
+			Mind Visual Diff.</para>
+		</section>
+	</chapter>
+
+	<chapter>
+		<title>Concepts and Usage</title>
+
+		<section id="concepts_mindwhat">
+			<title>Mind-What ?</title>
+
+			<section id="concepts_textual_diff">
+				<title>Legacy "Diff": A tool for developers to compare documents</title>
+
+				<para>Purely textual.</para>
+
+				<para>Used between documents, or to view differences between commits of a source code repository, to create patches...</para>
+				
+				<figure>
+					<mediaobject>
+						<imageobject>
+							<imagedata align="center" fileref="images/Screen_diff_bootCppAdl.png"
+								format="PNG" scalefit="1" width="100%" contentdepth="100%" /> <!-- scale="25" -->
+						</imageobject>
+					</mediaobject>
+					
+					<title>Diff example</title>
+				</figure>
+				
+					<para>
+						<note>Captured in Notepad++</note>
+					</para>
+				</section>
+
+			<section id="concepts_visual_diff">
+				<title>Mind Visual Diff</title>
+				
+				<para>Text is OK but... Needs time to read and understand changes, across multiple files.</para>
+				
+				<para>We like architecture visualizations !</para>
+			
+				<figure>
+					<mediaobject>
+						<imageobject>
+							<imagedata align="center" fileref="images/diff_helloworld_edited.png"
+								format="PNG" scalefit="1" width="100%" contentdepth="100%" /> <!-- scale="25" -->
+						</imageobject>
+					</mediaobject>
+				
+					<title>Mind Visual Diff Helloworld Sample</title>
+				</figure>
+			</section>
+		
+		</section>
+	</chapter>
+	
 </book>
