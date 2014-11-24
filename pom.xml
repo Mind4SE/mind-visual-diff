@@ -1,31 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
-	<groupId>org.ow2.mind</groupId>
+	
+	<parent>
+		<groupId>org.ow2.mind</groupId>
+		<artifactId>mind-compiler</artifactId>
+		<version>2.2-SNAPSHOT</version>
+	</parent>
+	
+	<description>A visual 'Diff' for Mind architectures.</description>
+	
 	<artifactId>mind-visual-diff</artifactId>
 	<version>0.1.1-SNAPSHOT</version>
-
-	<description>A visual 'Diff' for Mind architectures.</description>
-
+	
 	<dependencies>
 		<dependency>
-			<groupId>org.ow2.mind</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>mindc</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.ow2.mind</groupId>
-			<artifactId>common-backend</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>1.4</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 	</dependencies>
-
+	<dependencyManagement> 
+		<dependencies>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>adl-backend</artifactId>
+				<version>${project.parent.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>adl-frontend</artifactId>
+				<version>${project.parent.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>common-frontend</artifactId>
+				<version>${project.parent.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>idl-frontend</artifactId>
+				<version>${project.parent.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>adl-parser</artifactId>
+				<version>${project.parent.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>idl-parser</artifactId>
+				<version>${project.parent.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>common-backend</artifactId>
+				<version>${project.parent.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>cpl-preproc</artifactId>
+				<version>${project.parent.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>idl-backend</artifactId>
+				<version>${project.parent.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>fractal-runtime</artifactId>
+				<version>${project.parent.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>plugin-loader</artifactId>
+				<version>${project.parent.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>annotations</artifactId>
+				<version>${project.parent.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -65,7 +125,7 @@
 			
 			<!-- Begin Docbook plugins -->
 			<plugin>
-                <artifactId>maven-resources-plugin</artifactId>
+				<artifactId>maven-resources-plugin</artifactId>
 				<version>2.5</version>
 				<inherited>false</inherited>
 				<executions>
@@ -88,7 +148,7 @@
 					</execution>
 				</executions>
 			</plugin>
-
+			
 			<plugin>
 				<groupId>com.agilejava.docbkx</groupId>
 				<artifactId>docbkx-maven-plugin</artifactId>
@@ -188,7 +248,7 @@
 							</customizationParameters>
 						</configuration>
 					</execution>
-
+					
 				</executions>
 				<configuration>
 					<targetDirectory>${project.build.directory}/site</targetDirectory>
@@ -201,7 +261,7 @@
 			<!-- End Docbook plugins -->
 		</plugins>
 	</build>
-
+	
 	<profiles>
 		<profile>
 			<id>src-packages</id>
@@ -211,7 +271,7 @@
 					<value>true</value>
 				</property>
 			</activation>
-
+			
 			<build>
 				<plugins>
 					<plugin>
@@ -236,5 +296,5 @@
 			</build>
 		</profile>
 	</profiles>
-
+	
 </project>
