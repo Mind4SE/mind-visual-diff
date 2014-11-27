@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE section[
+<!ENTITY % myents SYSTEM "../shared.ent" >
+%myents;
+]>
+<section xml:id="mind-diff_aim" xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
+  <title>Aim of the &productName;</title>
+  <para>The <emphasis>&productName;</emphasis> provides several possibilities to compare visually
+    two Mind architectures.</para>
+  <para>The two Mind architectures compared can be either:</para>
+  <para>
+    <itemizedlist>
+      <listitem>
+        <para>2 versions of a component, &productName; output can be used to show what has been
+          removed, added and modified between the 2 versions.</para>
+      </listitem>
+      <listitem>
+        <para>2 similar components, &productName; output can be used to show what is common between
+          the components, in other words, what are the re-used components inside.</para>
+      </listitem>
+    </itemizedlist>
+  </para>
+</section>

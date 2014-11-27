@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book[
+<!ENTITY % myents SYSTEM "./shared.ent" >
+%myents;
+]>
+<book status="draft" xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
+	<info>
+		<title><emphasis>&productName;</emphasis> User Guide</title>
+		<revhistory>
+			<revision>
+				<revnumber>0.2</revnumber>
+				<date>2014-11-06</date>
+				<author>
+					<personname>
+						<firstname>François</firstname>
+						<surname>DELOYE</surname>
+					</personname>
+				</author>
+				<revremark>Rework of <emphasis>&productName;</emphasis> User Guide</revremark>
+			</revision>
+			<revision>
+				<revnumber>0.1</revnumber>
+				<date>2014-09-04</date>
+				<author>
+					<personname>
+						<firstname>Stephane</firstname>
+						<surname>SEYVOZ</surname>
+					</personname>
+				</author>
+				<revremark>First revision of <emphasis>&productName;</emphasis> User
+					Guide</revremark>
+			</revision>
+		</revhistory>
+	</info>
+	<chapter>
+		<title>Introduction</title>
+		<section>
+			<title>Aim of this document</title>
+			<para>This document introduces the <emphasis>&productName;</emphasis>.</para>
+		</section>
+		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="sections/mind-diff_aim.xml"/>
+	</chapter>
+	<chapter>
+		<title>Overview</title>
+		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="sections/mind-diff_cmd.xml"/>
+	</chapter>
+	<chapter>
+		<title>Architecture evolutions visualization</title>
+		<section>
+			<title>Mind Visual Diff output</title>
+			<para>Here is an output of a simple example where the interface instance <code>s1</code> has been
+				replaced by <code>s3</code> in the <code><emphasis role="underline"
+						>serverSubComp</emphasis></code> component and the binding from
+					<code>clientSubComp.s1</code> has been changed accordingly.</para>
+			<example>
+				<title>Example of Mind Visual Diff output</title>
+				<mediaobject>
+					<imageobject role="fo">
+						<imagedata align="center" fileref="images/diff_helloworld_edited.svg"
+							format="SVG" width="80%"/>
+					</imageobject>
+				</mediaobject>
+			</example>
+		</section>
+		<section>
+			<title>With <code>--flatten</code> option</title>
+			<example>
+				<title>Mind Visual Diff output of two versions of an application (flattened
+					view)</title>
+				<mediaobject>
+					<imageobject role="fo">
+						<imagedata align="center"
+							fileref="images/Screen_diff_testHardware_ADS13x.svg" format="SVG"
+							width="80%"/>
+					</imageobject>
+				</mediaobject>
+			</example>
+			<para>The benefit of the flattened view is to have all the differences in a single
+				picture:</para>
+			<para>
+				<itemizedlist>
+					<listitem>
+						<para>3 deleted components</para>
+					</listitem>
+					<listitem>
+						<para>6 new components</para>
+					</listitem>
+					<listitem>
+						<para>the rest is unchanged</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+		</section>
+	</chapter>
+</book>
