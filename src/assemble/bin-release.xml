@@ -17,37 +17,20 @@
             <fileMode>0644</fileMode>
         </dependencySet>
     </dependencySets>
-<!-- 
+
     <fileSets>
         <fileSet>
-            <directory>src/assemble/resources/examples</directory>
-            <filtered>false</filtered>
-            <outputDirectory>examples</outputDirectory>
-            <fileMode>0644</fileMode>
-             <useDefaultExcludes>false</useDefaultExcludes>
-             <excludes>
-				<exclude>**/docbkx/**</exclude>
-				<exclude>**/site/**</exclude>
-				<exclude>**/target/**</exclude>
-				<exclude>**/.metadata/**</exclude>
-				<exclude>**/.settings/**</exclude>
-				<exclude>**/.localmindrepo/**</exclude>
-          	</excludes>
+            <directory>src/assemble/resources/bin</directory>
+            <outputDirectory>bin</outputDirectory>
+            <directoryMode>0644</directoryMode>
         </fileSet>
     </fileSets>
- -->
+ 
     <files>
         <file>
-            <source>src/assemble/resources/mind-diff</source>
-            <fileMode>0755</fileMode>
-            <outputDirectory>bin</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-        <file>
-            <source>src/assemble/resources/mind-diff.bat</source>
-            <fileMode>0755</fileMode>
-            <outputDirectory>bin</outputDirectory>
-            <filtered>true</filtered>
+            <source>target/site/mind-diff.pdf</source>
+            <fileMode>0644</fileMode>
+            <outputDirectory>doc</outputDirectory>
         </file>
     </files>
 </assembly>
