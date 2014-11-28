@@ -1,0 +1,11 @@
+digraph TopLevel {
+rankdir=LR;
+ranksep=3;
+clientSubCompComp [URL="TopLevel.clientSubComp.gv",shape=Mrecord,style=filled,fillcolor=lightgrey,color=black,label="clientSubComp | {{ <entryPoint> entryPoint } | | { <s1> s1 | <s2> s2 }} | " ];
+serverSubCompComp [URL="TopLevel.serverSubComp.gv",shape=Mrecord,style=filled,fillcolor=lightgrey,color=darkgoldenrod2,penwidth=10,label="serverSubComp | {{ <s1> -- s1 | <s2> s2 | <s3> ++ s3 } | | {  }} | " ];
+SrventryPoint->clientSubCompComp:entryPoint[colorscheme="set19" color=9, penwidth=4];
+clientSubCompComp:s1->serverSubCompComp:s1[colorscheme="set19" color=1, penwidth=10];
+clientSubCompComp:s2->serverSubCompComp:s2[colorscheme="set19" color=9, penwidth=4];
+clientSubCompComp:s1->serverSubCompComp:s3[colorscheme="set19" color=3, penwidth=10];
+{rank=source; color=none; SrventryPoint [shape=record,style=filled,fillcolor=firebrick2,penwidth=2,color=black,label="entryPoint", URL="f:\Seyvoz\Livraisons-m4se\mind4se-compiler-0.1-SNAPSHOT-201408081444\runtime\boot\Main.itf", height=1 ];}
+}

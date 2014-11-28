@@ -87,19 +87,6 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 	</dependencyManagement>
 	
 	<build>
-		<pluginManagement>
-			<plugins>
-				<!-- Use Java 1.5 -->
-				<plugin>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.1</version>
-					<configuration>
-						<source>1.5</source>
-						<target>1.5</target>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -123,7 +110,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 				</executions>
 			</plugin>
 			
-			<!-- Begin Docbook plugins -->
+			<!-- User documentation generation -->
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>2.5</version>
@@ -132,7 +119,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 					<execution>
 						<id>copy-docbook-resources</id>
 						<!-- here the phase you need -->
-						<phase>pre-site</phase>
+						<phase>prepare-package</phase>
 						<goals>
 							<goal>copy-resources</goal>
 						</goals>
@@ -141,7 +128,11 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 							<outputDirectory>${project.build.directory}/site/images</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${basedir}/src/docbkx/guide/images</directory>
+									<directory>${basedir}/src/docbkx/images</directory>
+									<includes>
+										<include>**/*.png</include>
+										<include>**/*.svg</include>
+									</includes>
 								</resource>
 							</resources>
 						</configuration>
@@ -154,22 +145,24 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 				<artifactId>docbkx-maven-plugin</artifactId>
 				<inherited>false</inherited>
 				<executions>
+					<!-- User Guide PDF execution -->
 					<execution>
 						<id>pdf</id>
-						<phase>pre-site</phase>
+						<phase>prepare-package</phase>
 						<goals>
 							<goal>generate-pdf</goal>
 						</goals>
 						<inherited>false</inherited>
 						<configuration>
 							<targetDirectory>${project.build.directory}/site</targetDirectory>
-							<foCustomization>${basedir}/src/docbkx/xsl/minddoc-fo.xsl</foCustomization>
-							<draftWatermarkImage>${basedir}/src/docbkx/images/draft.png</draftWatermarkImage>
+							<foCustomization>${project.build.directory}/site/xsl/minddoc-fo.xsl</foCustomization>
+							<draftWatermarkImage>${project.build.directory}/site/images/draft.png</draftWatermarkImage>
 						</configuration>
 					</execution>
+					<!-- User Guide HTML executions -->
 					<execution>
 						<id>html-printable</id>
-						<phase>pre-site</phase>
+						<phase>prepare-package</phase>
 						<goals>
 							<goal>generate-html</goal>
 						</goals>
@@ -177,22 +170,21 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 						<configuration>
 							<targetDirectory>${project.build.directory}/site/printable</targetDirectory>
 							<imgSrcPath>../</imgSrcPath>
-							<htmlCustomization>${basedir}/src/docbkx/xsl/minddoc-html-printable.xsl</htmlCustomization>
+							<htmlCustomization>${project.build.directory}/site/xsl/minddoc-html-printable.xsl</htmlCustomization>
 							<htmlStylesheet>../css/docbook-printable.css</htmlStylesheet>
 						</configuration>
 					</execution>
-					<!-- User Guide HTML executions -->
 					<execution>
 						<id>userguide-html</id>
-						<phase>pre-site</phase>
+						<phase>prepare-package</phase>
 						<goals>
 							<goal>generate-html</goal>
 						</goals>
 						<inherited>false</inherited>
 						<configuration>
-							<includes>mind-diff-guide.xml</includes>
+							<includes>mind-diff.xml</includes>
 							<targetDirectory>${project.build.directory}/site</targetDirectory>
-							<htmlCustomization>${basedir}/src/docbkx/xsl/minddoc-html.xsl</htmlCustomization>
+							<htmlCustomization>${project.build.directory}/site/xsl/minddoc-html.xsl</htmlCustomization>
 							<htmlStylesheet>css/docbook.css</htmlStylesheet>
 							<customizationParameters>
 								<parameter>
@@ -201,32 +193,32 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 								</parameter>
 								<parameter>
 									<name>pdf.link</name>
-									<value>mind-diff-guide.pdf</value>
+									<value>mind-diff.pdf</value>
 								</parameter>
 								<parameter>
 									<name>chunked.link</name>
-									<value>guide/mind-diff-guide.html</value>
+									<value>userGuide/mind-diff.html</value>
 								</parameter>
 								<parameter>
 									<name>printable.link</name>
-									<value>printable/mind-diff-guide.html</value>
+									<value>printable/mind-diff.html</value>
 								</parameter>
 							</customizationParameters>
 						</configuration>
 					</execution>
 					<execution>
 						<id>userguide-html-chunked</id>
-						<phase>pre-site</phase>
+						<phase>prepare-package</phase>
 						<goals>
 							<goal>generate-html</goal>
 						</goals>
 						<inherited>false</inherited>
 						<configuration>
-							<includes>mind-diff-guide.xml</includes>
+							<includes>mind-diff.xml</includes>
 							<chunkedOutput>true</chunkedOutput>
-							<targetDirectory>${project.build.directory}/site/guide</targetDirectory>
+							<targetDirectory>${project.build.directory}/site/userGuide</targetDirectory>
 							<imgSrcPath>../</imgSrcPath>
-							<htmlCustomization>${basedir}/src/docbkx/xsl/minddoc-chunk.xsl</htmlCustomization>
+							<htmlCustomization>${project.build.directory}/site/xsl/minddoc-chunk.xsl</htmlCustomization>
 							<htmlStylesheet>../css/docbook-chunk.css</htmlStylesheet>
 							<customizationParameters>
 								<parameter>
@@ -235,15 +227,15 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 								</parameter>
 								<parameter>
 									<name>pdf.link</name>
-									<value>../mind-diff-guide.pdf</value>
+									<value>../mind-diff.pdf</value>
 								</parameter>
 								<parameter>
 									<name>single.link</name>
-									<value>../mind-diff-guide.html</value>
+									<value>../mind-diff.html</value>
 								</parameter>
 								<parameter>
 									<name>printable.link</name>
-									<value>../printable/mind-diff-guide.html</value>
+									<value>../printable/mind-diff.html</value>
 								</parameter>
 							</customizationParameters>
 						</configuration>
@@ -251,14 +243,11 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 					
 				</executions>
 				<configuration>
+					<sourceDirectory>${basedir}/src/docbkx</sourceDirectory>
 					<targetDirectory>${project.build.directory}/site</targetDirectory>
-					<xslthlConfig>${basedir}/src/docbkx/xsl/xslthl-config.xml</xslthlConfig>
-					<highlightSource>1</highlightSource>
-					<xincludeSupported>true</xincludeSupported>
 				</configuration>
 			</plugin>
 			
-			<!-- End Docbook plugins -->
 		</plugins>
 	</build>
 	
