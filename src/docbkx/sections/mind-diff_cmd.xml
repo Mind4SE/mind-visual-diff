@@ -12,42 +12,51 @@
   </section>
   <section>
     <title>The <command>mind-diff</command> command</title>
-    <para>The <command>mind-diff</command> command has the 3 possible following syntaxes :<cmdsynopsis>
-        <command>mind-diff</command>
-        <arg choice="req" rep="repeat">--base-src-path=<replaceable>path list</replaceable></arg>
-      <arg choice="req" rep="repeat">--head-src-path=<replaceable>path list</replaceable></arg>
-        <arg choice="opt" rep="repeat"><replaceable>OPTIONS</replaceable></arg>
-        <arg choice="req"><replaceable>definition</replaceable></arg>
-      </cmdsynopsis></para>
-    <para>Compares <replaceable>definition</replaceable> component between
-        <code>--base-src-path</code> and <code>--head-src-path</code> versions.</para>
-    <para><cmdsynopsis>
-        <command>mind-diff</command>
-      <arg choice="req" rep="repeat">--base-src-path=<replaceable>path list</replaceable></arg>
-      <arg choice="req" rep="repeat">--head-src-path=<replaceable>path list</replaceable></arg>
-        <arg choice="opt" rep="repeat"><replaceable>OPTIONS</replaceable></arg>
-        <arg choice="req"><replaceable>baseDefinition</replaceable></arg>
-        <arg choice="req"><replaceable>headDdefinition</replaceable></arg>
-    </cmdsynopsis></para>
-    <para>Compares <replaceable>baseDefinition</replaceable> component of
-        <code>--base-src-path</code> to <replaceable>headDdefinition</replaceable> component of
-        <code>--head-src-path</code>.</para>
-    <para>
-      <cmdsynopsis>
-        <command>mind-diff</command>
-        <arg choice="req" rep="repeat">--src-path=<replaceable>path list</replaceable></arg>
-        <arg choice="opt" rep="repeat"><replaceable>OPTIONS</replaceable></arg>
-        <arg choice="req"><replaceable>baseDefinition</replaceable></arg>
-        <arg choice="req"><replaceable>headDdefinition</replaceable></arg>
-      </cmdsynopsis>
-    </para>
-    <para>Compares <replaceable>baseDefinition</replaceable> component to
-        <replaceable>headDdefinition</replaceable> component of <code>--src-path</code>.</para>
+    <para>The <command>mind-diff</command> command has the 3 possible syntaxes as follows :</para>
+    <itemizedlist>
+      <listitem>
+        <para><cmdsynopsis>
+          <command>mind-diff</command>
+          <arg choice="req" rep="repeat">--base-src-path=<replaceable>path list</replaceable></arg>
+          <arg choice="req" rep="repeat">--head-src-path=<replaceable>path list</replaceable></arg>
+          <arg choice="opt" rep="repeat"><replaceable>OPTIONS</replaceable></arg>
+          <arg choice="req"><replaceable>definition</replaceable></arg>
+        </cmdsynopsis></para>
+        <para>Compares <replaceable>definition</replaceable> component between
+          <code>--base-src-path</code> and <code>--head-src-path</code> versions.</para>
+      </listitem>
+      <listitem>
+        <para><cmdsynopsis>
+          <command>mind-diff</command>
+          <arg choice="req" rep="repeat">--base-src-path=<replaceable>path list</replaceable></arg>
+          <arg choice="req" rep="repeat">--head-src-path=<replaceable>path list</replaceable></arg>
+          <arg choice="opt" rep="repeat"><replaceable>OPTIONS</replaceable></arg>
+          <arg choice="req"><replaceable>baseDefinition</replaceable></arg>
+          <arg choice="req"><replaceable>headDdefinition</replaceable></arg>
+        </cmdsynopsis></para>
+        <para>Compares <replaceable>baseDefinition</replaceable> component of
+          <code>--base-src-path</code> to <replaceable>headDdefinition</replaceable> component of
+          <code>--head-src-path</code>.</para>
+      </listitem>
+      <listitem>
+        <para>
+          <cmdsynopsis>
+            <command>mind-diff</command>
+            <arg choice="req" rep="repeat">--src-path=<replaceable>path list</replaceable></arg>
+            <arg choice="opt" rep="repeat"><replaceable>OPTIONS</replaceable></arg>
+            <arg choice="req"><replaceable>baseDefinition</replaceable></arg>
+            <arg choice="req"><replaceable>headDdefinition</replaceable></arg>
+          </cmdsynopsis>
+        </para>
+        <para>Compares <replaceable>baseDefinition</replaceable> component to
+          <replaceable>headDdefinition</replaceable> component of <code>--src-path</code>.</para>
+      </listitem>
+    </itemizedlist>
     <para/>
     <para>Available options are : <variablelist>
-      <varlistentry>
-        <term><code>--flatten</code></term>
-        <listitem>
+        <varlistentry>
+          <term><code>--flatten</code></term>
+          <listitem>
           <para>Enable architecture tree flattening (remove composite levels).</para>
         </listitem>
       </varlistentry>
@@ -68,7 +77,6 @@
         <term><code>[--version|-v]</code></term>
         <listitem>
           <para>Print version number and exit.</para>
-    
         </listitem>
       </varlistentry>
     </variablelist></para>
