@@ -3,7 +3,7 @@
 <!ENTITY % myents SYSTEM "../shared.ent" >
 %myents;
 ]>
-<section xml:id="mind-diff_usage" xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
+<section xml:id="mind-diff_cmd" xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="en">
   <title>The <command>mind-diff</command> command</title>
   <section>
     <title>Pre-requisites</title>
